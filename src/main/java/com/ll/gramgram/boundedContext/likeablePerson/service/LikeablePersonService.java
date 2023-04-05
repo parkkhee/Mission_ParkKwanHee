@@ -50,7 +50,21 @@ public class LikeablePersonService {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
     }
 
+    @Transactional
+    public RsData<LikeablePerson> delete(Member member, long id) {
 
+        Optional<LikeablePerson> likepbyId = likeablePersonRepository.findById(id);
+        LikeablePerson likeablePerson = likepbyId.get();
+
+        //로그인된 아이디와 삭제하려는 likeableperson 테이블내의 좋아요를 한 아이디가 같은지 확인
+        if ( member.getInstaMember().getId() == likeablePerson.getFromInstaMember().getId() ) {
+            likeablePersonRepository.deleteById(id);
+            return RsData.of("S-1", "정상 삭제되었습니다.");
+        } else {
+            return RsData.of("F-4", "잘못된 회원입니다.");
+        }
+
+    }
 
 
 }
