@@ -66,15 +66,19 @@ public class LikeablePersonController {
         return "usr/likeablePerson/list";
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()") //먼저 웹 사이트에 로그인이 되어 있는지 확인.
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable("id") long id) {
-        if (rq.isLogin()) { //간단하게 먼저 웹 사이트에 로그인이 되어 있는지 확인.
-            RsData<LikeablePerson> deleteRsdata = likeablePersonService.delete(rq.getMember(), id);
-            return rq.redirectWithMsg("/likeablePerson/list", deleteRsdata);
-        } else {
-            return rq.redirectWithMsg("/member/login", RsData.of("F-2", "로그인 해주세요!"));
-        }
+        LikeablePerson likeablePerson = likeablePersonService.likeablepersonbyId(id);
+
+        RsData<LikeablePerson> deleteRsdata = likeablePersonService.delete(rq.getMember(),likeablePerson);
+
+//        if (rq.isLogin()) { //간단하게 먼저 웹 사이트에 로그인이 되어 있는지 확인.
+//            RsData<LikeablePerson> deleteRsdata = likeablePersonService.delete(rq.getMember(), id);
+//            return rq.redirectWithMsg("/likeablePerson/list", deleteRsdata);
+//        } else {
+//            return rq.redirectWithMsg("/member/login", RsData.of("F-2", "로그인 해주세요!"));
+//        }
 
     }
 
