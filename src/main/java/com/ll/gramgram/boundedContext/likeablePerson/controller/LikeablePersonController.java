@@ -12,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -67,11 +64,14 @@ public class LikeablePersonController {
     }
 
     @PreAuthorize("isAuthenticated()") //먼저 웹 사이트에 로그인이 되어 있는지 확인.
-    @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") long id) {
+    @DeleteMapping("/{id}")
+    public Long delete(@PathVariable("id") long id) {
         LikeablePerson likeablePerson = likeablePersonService.likeablepersonbyId(id);
+        return likeablePerson.getId();
 
-        RsData<LikeablePerson> deleteRsdata = likeablePersonService.delete(rq.getMember(),likeablePerson);
+//        RsData<LikeablePerson> deleteRsdata = likeablePersonService.delete(rq.getMember(),likeablePerson);
+
+//        return rq.redirectWithMsg("/likeablePerson/list", deleteRsdata);
 
 //        if (rq.isLogin()) { //간단하게 먼저 웹 사이트에 로그인이 되어 있는지 확인.
 //            RsData<LikeablePerson> deleteRsdata = likeablePersonService.delete(rq.getMember(), id);
