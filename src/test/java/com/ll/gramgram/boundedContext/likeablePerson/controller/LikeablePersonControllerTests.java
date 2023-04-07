@@ -152,18 +152,18 @@ public class LikeablePersonControllerTests {
         ;
     }
 
-    @Autowired
-    LikeablePersonController likeablePersonController;
-    @Test
-    @DisplayName("로그인한 유저가 삭제하려는 인스타 아이디를 잘 가져오는지 테스트")
-    @WithUserDetails("user3")
-    void t006() throws Exception {
-        // WHEN
-        Long likeablePerson = likeablePersonController.delete(1);
-
-        // THEN
-        Assertions.assertThat(likeablePerson).isEqualTo(1L);
-    }
+//    @Autowired  //기능만 테스트
+//    LikeablePersonController likeablePersonController;
+//    @Test
+//    @DisplayName("로그인한 유저가 삭제하려는 인스타 아이디를 잘 가져오는지 테스트")
+//    @WithUserDetails("user3")
+//    void t006() throws Exception {
+//        // WHEN
+//        Long likeablePerson = likeablePersonController.delete(1);
+//
+//        // THEN
+//        Assertions.assertThat(likeablePerson).isEqualTo(1L);
+//    }
 
 
 

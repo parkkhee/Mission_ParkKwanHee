@@ -50,29 +50,33 @@ public class LikeablePersonService {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
     }
 
-    @Transactional
-    public RsData<LikeablePerson> delete(Member member, LikeablePerson likeablePerson) {
+    public RsData<LikeablePerson> canActorDelete(Member member, LikeablePerson likeablePerson) {
 
-        if (member.getInstaMember().getId().equals(likeablePerson.getFromInstaMember())) {
-            likeablePersonRepository.delete(likeablePerson);
-            return RsData.of("S-1", "정상 삭제되었습니다.");
-        }else {
-            return RsData.of("F-4", "잘못된 회원입니다.");
+        if (likeablePerson.equals(null)) {
+            return RsData.of("F-1", "존재하지 않는 회원입니다.");
         }
 
-        //로그인된 아이디와 삭제하려는 likeableperson 테이블내의 좋아요를 한 아이디가 같은지 확인
-//        if ( member.getInstaMember().getId() == likeablePerson.getFromInstaMember().getId() ) {
-//            likeablePersonRepository.deleteById(id);
-//            return RsData.of("S-1", "정상 삭제되었습니다.");
-//        } else {
-//            return RsData.of("F-4", "잘못된 회원입니다.");
-//        }
+        if (!member.getInstaMember().getId().equals(likeablePerson.getFromInstaMember())) {
+            return RsData.of("F-2", "권한이 없는 회원입니다.");
+        }
+
+        return RsData.of("S-1", "권한이 있는 회원입니다.");
 
     }
 
-    public LikeablePerson likeablepersonbyId(long id) {
+    @Transactional
+    public RsData<LikeablePerson> delete(LikeablePerson likeablePerson) {
 
-        LikeablePerson likeablePerson = likeablePersonRepository.findById(id).orElseThrow();
+        likeablePersonRepository.delete(likeablePerson);
+
+        String likeCanceledUsername = likeablePerson.getToInstaMember().getUsername();
+        return RsData.of("S-1", "%s님에 대한 호감을 취소하였습니다.".formatted(likeCanceledUsername));
+
+    }
+
+    public LikeablePerson likeablepersonbyId(Long id) {
+
+        LikeablePerson likeablePerson = likeablePersonRepository.findById(id).orElse(null);
 
         return likeablePerson;
 

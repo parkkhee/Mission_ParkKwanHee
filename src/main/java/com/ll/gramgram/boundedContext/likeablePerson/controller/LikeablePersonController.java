@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/likeablePerson")
@@ -65,20 +66,21 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()") //먼저 웹 사이트에 로그인이 되어 있는지 확인.
     @DeleteMapping("/{id}")
-    public Long delete(@PathVariable("id") long id) {
+    public String delete(@PathVariable("id") Long id) {
         LikeablePerson likeablePerson = likeablePersonService.likeablepersonbyId(id);
-        return likeablePerson.getId();
 
-//        RsData<LikeablePerson> deleteRsdata = likeablePersonService.delete(rq.getMember(),likeablePerson);
+        RsData canActorDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
 
-//        return rq.redirectWithMsg("/likeablePerson/list", deleteRsdata);
+        if (canActorDeleteRsData.isFail()) return rq.historyBack(canActorDeleteRsData);
 
-//        if (rq.isLogin()) { //간단하게 먼저 웹 사이트에 로그인이 되어 있는지 확인.
-//            RsData<LikeablePerson> deleteRsdata = likeablePersonService.delete(rq.getMember(), id);
-//            return rq.redirectWithMsg("/likeablePerson/list", deleteRsdata);
-//        } else {
-//            return rq.redirectWithMsg("/member/login", RsData.of("F-2", "로그인 해주세요!"));
-//        }
+        RsData<LikeablePerson> deleteRsdata = likeablePersonService.delete(likeablePerson);
+
+        if (deleteRsdata.isFail()) {
+            return rq.historyBack(deleteRsdata);
+        }
+
+        return rq.redirectWithMsg("/likeablePerson/list", deleteRsdata);
+
 
     }
 
