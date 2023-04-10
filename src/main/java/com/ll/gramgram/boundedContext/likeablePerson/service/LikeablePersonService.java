@@ -52,7 +52,7 @@ public class LikeablePersonService {
 
     public RsData<LikeablePerson> canActorDelete(Member member, LikeablePerson likeablePerson) {
 
-        if (likeablePerson.equals(null)) {
+        if (likeablePerson == null) {
             return RsData.of("F-1", "존재하지 않는 회원입니다.");
         }
 
@@ -74,9 +74,9 @@ public class LikeablePersonService {
 
     }
 
-    public LikeablePerson likeablepersonbyId(Long id) {
+    public Optional<LikeablePerson> likeablepersonbyId(Long id) {
 
-        LikeablePerson likeablePerson = likeablePersonRepository.findById(id).orElse(null);
+        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(id);
 
         return likeablePerson;
 
