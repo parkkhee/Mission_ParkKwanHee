@@ -50,7 +50,35 @@ public class LikeablePersonService {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
     }
 
+    public RsData<LikeablePerson> canActorDelete(Member member, LikeablePerson likeablePerson) {
 
+        if (likeablePerson.equals(null)) {
+            return RsData.of("F-1", "존재하지 않는 회원입니다.");
+        }
 
+        if (!member.getInstaMember().getId().equals(likeablePerson.getFromInstaMember())) {
+            return RsData.of("F-2", "권한이 없는 회원입니다.");
+        }
 
+        return RsData.of("S-1", "권한이 있는 회원입니다.");
+
+    }
+
+    @Transactional
+    public RsData<LikeablePerson> delete(LikeablePerson likeablePerson) {
+
+        likeablePersonRepository.delete(likeablePerson);
+
+        String likeCanceledUsername = likeablePerson.getToInstaMember().getUsername();
+        return RsData.of("S-1", "%s님에 대한 호감을 취소하였습니다.".formatted(likeCanceledUsername));
+
+    }
+
+    public LikeablePerson likeablepersonbyId(Long id) {
+
+        LikeablePerson likeablePerson = likeablePersonRepository.findById(id).orElse(null);
+
+        return likeablePerson;
+
+    }
 }

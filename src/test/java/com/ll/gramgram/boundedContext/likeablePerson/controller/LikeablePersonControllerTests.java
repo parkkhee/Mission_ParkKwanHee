@@ -1,6 +1,9 @@
 package com.ll.gramgram.boundedContext.likeablePerson.controller;
 
 
+import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
+import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -149,4 +151,23 @@ public class LikeablePersonControllerTests {
                         """.stripIndent().trim())));
         ;
     }
+
+//    @Autowired  //기능만 테스트
+//    LikeablePersonController likeablePersonController;
+//    @Test
+//    @DisplayName("로그인한 유저가 삭제하려는 인스타 아이디를 잘 가져오는지 테스트")
+//    @WithUserDetails("user3")
+//    void t006() throws Exception {
+//        // WHEN
+//        Long likeablePerson = likeablePersonController.delete(1);
+//
+//        // THEN
+//        Assertions.assertThat(likeablePerson).isEqualTo(1L);
+//    }
+
+
+
+
+
+
 }
