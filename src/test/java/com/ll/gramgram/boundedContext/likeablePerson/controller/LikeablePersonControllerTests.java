@@ -1,8 +1,11 @@
 package com.ll.gramgram.boundedContext.likeablePerson.controller;
 
 
+import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
+import com.ll.gramgram.boundedContext.member.entity.Member;
+import com.ll.gramgram.boundedContext.member.service.MemberService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -222,6 +225,68 @@ public class LikeablePersonControllerTests {
                                 .with(csrf())
                                 .param("username", "insta_user100")
                                 .param("attractiveTypeCode", "2")
+                )
+                .andDo(print());
+
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(content().string("fail"))
+        ;
+
+    }
+
+    @Autowired
+    MemberService memberService;
+    @Autowired
+    InstaMemberService instaMemberService;
+    @Test
+    @DisplayName("케이스 5 : 한명의 인스타회원이 11명 이상의 호감상대를 등록 할 수 없습니다.")
+    @WithUserDetails("user3")
+    void t010() throws Exception {
+
+        // WHEN
+        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
+//        instaMemberService.connect(memberUser3, "insta_user3", "W");
+        for (int i = 0; i < 8; i++) {
+            likeablePersonService.like(memberUser3, "insta_use"+i, 1);
+        }
+
+        ResultActions resultActions = mvc
+
+                .perform(
+                        post("/likeablePerson/add")
+                                .with(csrf())
+                                .param("username", "qqqq")
+                                .param("attractiveTypeCode", "2")
+                )
+                .andDo(print());
+
+
+        // THEN
+//        System.out.println("홓호홓 : " + likeablePersonService.findByFromInstaMemberId(memberUser3.getInstaMember().getId()).size());
+        assertThat(likeablePersonService.findByFromInstaMemberId(memberUser3.getInstaMember().getId()).size()).isEqualTo(10);
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(content().string("fail"))
+        ;
+
+    }
+
+    @Test
+    @DisplayName("케이스 6 : 케이스 4 가 발생했을 때 기존의 사유와 다른 사유로 호감을 표시하는 경우에는 성공으로 처리한다.")
+    @WithUserDetails("user3")
+    void t011() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/likeablePerson/add")
+                                .with(csrf())
+                                .param("username", "insta_user100")
+                                .param("attractiveTypeCode", "1")
                 )
                 .andDo(print());
 

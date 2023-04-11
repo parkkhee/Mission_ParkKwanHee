@@ -47,12 +47,13 @@ public class LikeablePersonController {
                 addForm.getUsername(), addForm.getAttractiveTypeCode());
 
         if (createRsData.isFail()) {
-//            return rq.historyBack(createRsData);
-            return "usr/home/test";
+            return rq.historyBack(createRsData);
+//            return "usr/home/test"; // 테스트 코드 실행을 위해
         }
 
 
-        return rq.redirectWithMsg("/likeablePerson/list", createRsData);
+//        return rq.redirectWithMsg("/likeablePerson/list", createRsData);
+        return "usr/home/test";
     }
 
     @PreAuthorize("isAuthenticated()")

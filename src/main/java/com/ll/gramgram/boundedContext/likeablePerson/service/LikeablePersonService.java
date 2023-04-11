@@ -31,11 +31,22 @@ public class LikeablePersonService {
             return RsData.of("F-1", "본인을 호감상대로 등록할 수 없습니다.");
         }
 
+        //호감 추가 하려는 유저에 대한 InstaMember 를 가져온다
         Optional<InstaMember> byUsername = instaMemberService.findByUsername(username);
 
+        //동일한 유저 인지 확인하는 메서드
         if (byUsername.isPresent() && likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(
                 member.getInstaMember().getId(), byUsername.get().getId()).isPresent() ) {
             return RsData.of("F-3","이미 동일한 유형으로 등록한 호감상대 입니다.");
+        }
+
+        //로그인한 유저가 좋아하는 LikeablePerson ListArray 불러오기
+        List<LikeablePerson> byFromInstaMemberId = likeablePersonRepository.findByFromInstaMemberId(
+                member.getInstaMember().getId());
+
+        // 호감상대 10명으로 제한
+        if (byFromInstaMemberId.size()>9) {
+            return RsData.of("F-4","이미 호감상대가 10명입니다;(");
         }
 
         InstaMember fromInstaMember = member.getInstaMember();
