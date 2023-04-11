@@ -5,6 +5,8 @@ import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,11 +43,14 @@ public class LikeablePersonController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/add")
     public String add(@Valid AddForm addForm) {
-        RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
+        RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(),
+                addForm.getUsername(), addForm.getAttractiveTypeCode());
 
         if (createRsData.isFail()) {
-            return rq.historyBack(createRsData);
+//            return rq.historyBack(createRsData);
+            return "usr/home/test";
         }
+
 
         return rq.redirectWithMsg("/likeablePerson/list", createRsData);
     }

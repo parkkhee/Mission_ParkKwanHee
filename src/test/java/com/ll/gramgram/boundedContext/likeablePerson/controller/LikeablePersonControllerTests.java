@@ -211,7 +211,6 @@ public class LikeablePersonControllerTests {
         assertThat(likeablePersonService.likeablepersonbyId(1L).isPresent()).isEqualTo(true);
     }
 
-
     @Test
     @DisplayName("케이스 4 : 한명의 인스타회원이 다른 인스타회원에게 중복으로 호감표시를 할 수 없습니다.")
     @WithUserDetails("user3")
@@ -226,11 +225,12 @@ public class LikeablePersonControllerTests {
                 )
                 .andDo(print());
 
+
         // THEN
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("add"))
-                .andExpect(status().is4xxClientError())
+                .andExpect(content().string("fail"))
         ;
 
     }

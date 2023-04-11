@@ -20,6 +20,7 @@ public class LikeablePersonService {
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
 
+
     @Transactional
     public RsData<LikeablePerson> like(Member member, String username, int attractiveTypeCode) {
         if ( member.hasConnectedInstaMember() == false ) {
@@ -28,6 +29,13 @@ public class LikeablePersonService {
 
         if (member.getInstaMember().getUsername().equals(username)) {
             return RsData.of("F-1", "본인을 호감상대로 등록할 수 없습니다.");
+        }
+
+        Optional<InstaMember> byUsername = instaMemberService.findByUsername(username);
+
+        if (byUsername.isPresent() && likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(
+                member.getInstaMember().getId(), byUsername.get().getId()).isPresent() ) {
+            return RsData.of("F-3","이미 동일한 유형으로 등록한 호감상대 입니다.");
         }
 
         InstaMember fromInstaMember = member.getInstaMember();
