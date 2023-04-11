@@ -6,11 +6,13 @@ import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -37,7 +39,23 @@ public class LikeablePersonService {
         //동일한 유저 인지 확인하는 메서드
         if (byUsername.isPresent() && likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(
                 member.getInstaMember().getId(), byUsername.get().getId()).isPresent() ) {
-            return RsData.of("F-3","이미 동일한 유형으로 등록한 호감상대 입니다.");
+
+            if (Objects.equals(likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(
+                            member.getInstaMember().getId(), byUsername.get().getId())
+                    .get().getAttractiveTypeCode(), attractiveTypeCode)) {
+                return RsData.of("F-3","이미 동일한 유형으로 등록한 호감상대 입니다.");
+            }
+
+            // 수정할 LikeablePerson 찾기
+            LikeablePerson byFromInstaMemberIdAndToInstaMemberId =
+                    likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(
+                    member.getInstaMember().getId(), byUsername.get().getId()).orElseThrow();
+
+            // 레포지토리에서 수정하기
+            likeablePersonRepository.updateByLikeablePersonId(
+                    byFromInstaMemberIdAndToInstaMemberId.getId(), attractiveTypeCode);
+
+            return RsData.of("S-2","호감상대 유형이 변경 되었습니다.");
         }
 
         //로그인한 유저가 좋아하는 LikeablePerson ListArray 불러오기
@@ -82,7 +100,7 @@ public class LikeablePersonService {
             return RsData.of("F-1", "존재하지 않는 회원입니다.");
         }
 
-        if (!member.getInstaMember().getId().equals(likeablePerson.getFromInstaMember())) {
+        if (!member.getInstaMember().getId().equals(likeablePerson.getFromInstaMember().getId())) {
             return RsData.of("F-2", "권한이 없는 회원입니다.");
         }
 

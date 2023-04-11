@@ -16,6 +16,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -286,7 +287,7 @@ public class LikeablePersonControllerTests {
                         post("/likeablePerson/add")
                                 .with(csrf())
                                 .param("username", "insta_user100")
-                                .param("attractiveTypeCode", "1")
+                                .param("attractiveTypeCode", "3")
                 )
                 .andDo(print());
 
@@ -295,7 +296,7 @@ public class LikeablePersonControllerTests {
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("add"))
-                .andExpect(content().string("fail"))
+                .andExpect(MockMvcResultMatchers.content().string(org.hamcrest.Matchers.containsString("/likeablePerson/list")))
         ;
 
     }

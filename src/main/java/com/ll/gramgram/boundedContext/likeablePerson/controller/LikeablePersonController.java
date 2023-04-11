@@ -51,9 +51,8 @@ public class LikeablePersonController {
 //            return "usr/home/test"; // 테스트 코드 실행을 위해
         }
 
-
-//        return rq.redirectWithMsg("/likeablePerson/list", createRsData);
-        return "usr/home/test";
+        return rq.redirectWithMsg("/likeablePerson/list", createRsData);
+//        return "usr/home/test";
     }
 
     @PreAuthorize("isAuthenticated()")
