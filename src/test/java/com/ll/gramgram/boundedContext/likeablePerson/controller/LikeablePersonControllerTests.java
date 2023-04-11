@@ -212,5 +212,29 @@ public class LikeablePersonControllerTests {
     }
 
 
+    @Test
+    @DisplayName("케이스 4 : 한명의 인스타회원이 다른 인스타회원에게 중복으로 호감표시를 할 수 없습니다.")
+    @WithUserDetails("user3")
+    void t009() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/likeablePerson/add")
+                                .with(csrf())
+                                .param("username", "insta_user100")
+                                .param("attractiveTypeCode", "2")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is4xxClientError())
+        ;
+
+    }
+
+
 
 }
