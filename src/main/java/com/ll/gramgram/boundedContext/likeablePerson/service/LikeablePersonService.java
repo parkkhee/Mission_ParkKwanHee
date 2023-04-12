@@ -8,6 +8,7 @@ import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRe
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,9 @@ import java.util.Optional;
 public class LikeablePersonService {
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
+
+    @Value("${custom.registration.limit}")
+    private int registrationLimit;
 
 
     @Transactional
@@ -63,7 +67,8 @@ public class LikeablePersonService {
                 member.getInstaMember().getId());
 
         // 호감상대 10명으로 제한
-        if (byFromInstaMemberId.size()>9) {
+
+        if (byFromInstaMemberId.size()>=registrationLimit) {
             return RsData.of("F-4","이미 호감상대가 10명입니다;(");
         }
 
