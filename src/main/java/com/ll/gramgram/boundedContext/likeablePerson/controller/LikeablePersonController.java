@@ -3,6 +3,7 @@ package com.ll.gramgram.boundedContext.likeablePerson.controller;
 import com.ll.gramgram.base.rq.Rq;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
+import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ import java.util.Optional;
 public class LikeablePersonController {
     private final Rq rq;
     private final LikeablePersonService likeablePersonService;
+    private final InstaMemberService instaMemberService;
 
 
     @PreAuthorize("isAuthenticated()")
@@ -43,13 +45,31 @@ public class LikeablePersonController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/add")
     public String add(@Valid AddForm addForm) {
-        RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(),
-                addForm.getUsername(), addForm.getAttractiveTypeCode());
 
-        if (createRsData.isFail()) {
-            return rq.historyBack(createRsData);
+        // LikeablePerson에 추가 할 수 있는지 확인
+        RsData canLikeRsData = likeablePersonService.canLike(rq.getMember(),
+                addForm.getUsername());
+
+        if (canLikeRsData.isFail()) {
+            return rq.historyBack(canLikeRsData);
 //            return "usr/home/test"; // 테스트 코드 실행을 위해
         }
+
+
+        // 중복 되는 LikeablePerson 이 있는지 확인
+        RsData isAlreadyLiked = likeablePersonService.isAlreadyLiked(rq.getMember(),
+                addForm.getUsername(), addForm.getAttractiveTypeCode());
+        if (isAlreadyLiked.isFail()) {
+            return rq.historyBack(canLikeRsData);
+        }
+        // 단순 매력포인트 변경이라면 업데이트 후 통과
+        if (isAlreadyLiked.getResultCode().equals("S-2")) {
+            return rq.redirectWithMsg("/likeablePerson/list", isAlreadyLiked);
+        }
+
+
+        RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(),
+                addForm.getUsername(), addForm.getAttractiveTypeCode());
 
         return rq.redirectWithMsg("/likeablePerson/list", createRsData);
 //        return "usr/home/test";

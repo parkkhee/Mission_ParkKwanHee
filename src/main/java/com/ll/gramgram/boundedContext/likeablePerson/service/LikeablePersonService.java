@@ -26,51 +26,68 @@ public class LikeablePersonService {
     @Value("${custom.registration.limit}")
     private int registrationLimit;
 
-
-    @Transactional
-    public RsData<LikeablePerson> like(Member member, String username, int attractiveTypeCode) {
+    // 호감표시가 가능한지 체크하는 메서드
+    public RsData canLike(Member member, String username) {
         if ( member.hasConnectedInstaMember() == false ) {
             return RsData.of("F-2", "먼저 본인의 인스타그램 아이디를 입력해야 합니다.");
         }
 
-        if (member.getInstaMember().getUsername().equals(username)) {
+        if (member.getInstaMember().getUsername().equals(username.trim())) {
             return RsData.of("F-1", "본인을 호감상대로 등록할 수 없습니다.");
         }
 
-        //호감 추가 하려는 유저에 대한 InstaMember 를 가져온다
-        Optional<InstaMember> byUsername = instaMemberService.findByUsername(username);
-
-        //동일한 유저 인지 확인하는 메서드
-        if (byUsername.isPresent() && likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(
-                member.getInstaMember().getId(), byUsername.get().getId()).isPresent() ) {
-
-            if (Objects.equals(likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(
-                            member.getInstaMember().getId(), byUsername.get().getId())
-                    .get().getAttractiveTypeCode(), attractiveTypeCode)) {
-                return RsData.of("F-3","이미 동일한 유형으로 등록한 호감상대 입니다.");
-            }
-
-            // 수정할 LikeablePerson 찾기
-            LikeablePerson byFromInstaMemberIdAndToInstaMemberId =
-                    likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(
-                    member.getInstaMember().getId(), byUsername.get().getId()).orElseThrow();
-
-            // 레포지토리에서 수정하기
-            likeablePersonRepository.updateByLikeablePersonId(
-                    byFromInstaMemberIdAndToInstaMemberId.getId(), attractiveTypeCode);
-
-            return RsData.of("S-2","호감상대 유형이 변경 되었습니다.");
-        }
-
         //로그인한 유저가 좋아하는 LikeablePerson ListArray 불러오기
-        List<LikeablePerson> byFromInstaMemberId = likeablePersonRepository.findByFromInstaMemberId(
+        List<LikeablePerson> memberbyFromInstaMemberId = likeablePersonRepository.findByFromInstaMemberId(
                 member.getInstaMember().getId());
-
         // 호감상대 10명으로 제한
-
-        if (byFromInstaMemberId.size()>=registrationLimit) {
+        if (memberbyFromInstaMemberId.size()>=registrationLimit) {
             return RsData.of("F-4","이미 호감상대가 10명입니다;(");
         }
+        return RsData.of("S-1", "이미 있는 유저 입니다. 다른 매력 포인트를 선택해 주세요.");
+    }
+
+    public RsData isAlreadyLiked(Member member, String username, int attractiveTypeCode) {
+        //호감 추가 하려는 유저에 대한 InstaMember 를 가져온다
+        Optional<InstaMember> toInstabyUsername = instaMemberService.findByUsername(username.trim());
+
+        if (toInstabyUsername.isPresent()) {
+            // 해당하는 LikeablePerson 있는지 확인해보기
+            Optional<LikeablePerson> targetLikeablePerson =
+                    likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(
+                            member.getInstaMember().getId(), toInstabyUsername.get().getId());
+            //동일한 유저 인지 확인하는 메서드
+            if ( targetLikeablePerson.isPresent() ) {
+
+                if (Objects.equals(targetLikeablePerson
+                        .get().getAttractiveTypeCode(), attractiveTypeCode)) {
+                    return RsData.of("F-3","이미 동일한 유형으로 등록한 호감상대 입니다.");
+                }
+
+                // 이미 있는 LikeablePerson 이지만 호감 유형이 다를때 수정을 위해 실행
+                isAlreadyLikedModify(targetLikeablePerson.get(),attractiveTypeCode);
+
+                return RsData.of("S-2","호감 상대 %s 유형이 변경 되었습니다.".formatted(username));
+            }
+        }
+        return RsData.of("S-1", "입력하신 인스타유저(%s)를 호감상대로 등록가능합니다.".formatted(username));
+    }
+
+    @Transactional
+    public void isAlreadyLikedModify(LikeablePerson targetLikeablePerson, int attractiveTypeCode) {
+
+        // 수정할 LikeablePerson 찾기
+        LikeablePerson byFromInstaMemberIdAndToInstaMemberId =
+                targetLikeablePerson;
+
+        // 레포지토리에서 수정하기
+        likeablePersonRepository.updateByLikeablePersonId(
+                byFromInstaMemberIdAndToInstaMemberId.getId(), attractiveTypeCode);
+
+    }
+
+    @Transactional
+    public RsData<LikeablePerson> like(Member member, String username, int attractiveTypeCode) {
+
 
         InstaMember fromInstaMember = member.getInstaMember();
         InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
