@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,6 +35,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         log.info(oauthId);
 
         String providerTypeCode = userRequest.getClientRegistration().getRegistrationId().toUpperCase();
+
+        // 네이버 id 만 가져오기 위해서
+        if (providerTypeCode.equals("NAVER")) {
+            HashMap<String, Object> response = oAuth2User.getAttribute("response");
+            oauthId = (String) response.get("id");
+        }
 
         String username = providerTypeCode + "__%s".formatted(oauthId);
 
