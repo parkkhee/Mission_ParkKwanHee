@@ -116,6 +116,10 @@ public class LikeablePersonService {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
     }
 
+    public Optional<LikeablePerson> findById(Long id) {
+        return likeablePersonRepository.findById(id);
+    }
+
     public RsData<LikeablePerson> canActorDelete(Member member, LikeablePerson likeablePerson) {
 
         if (likeablePerson == null) {
