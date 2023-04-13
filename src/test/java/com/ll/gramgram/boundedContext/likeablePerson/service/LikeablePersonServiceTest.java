@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
+import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import org.junit.jupiter.api.DisplayName;
@@ -130,4 +131,11 @@ class LikeablePersonServiceTest {
     }
 
 
+    @Test
+    @DisplayName("설정파일에 있는 최대가능호감표시 수 가져오기")
+    void t003() throws Exception {
+        long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
+
+        assertThat(likeablePersonFromMax).isEqualTo(10);
+    }
 }
