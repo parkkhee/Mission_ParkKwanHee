@@ -27,18 +27,29 @@ public class LikeablePersonService {
     private int registrationLimit;
 
     // 호감표시가 가능한지 체크하는 메서드
-    public RsData canLike(Member member, String username) {
-        if ( member.hasConnectedInstaMember() == false ) {
+    public RsData canLike(Member actor, String username) {
+        if ( actor.hasConnectedInstaMember() == false ) {
             return RsData.of("F-2", "먼저 본인의 인스타그램 아이디를 입력해야 합니다.");
         }
 
-        if (member.getInstaMember().getUsername().equals(username.trim())) {
+        InstaMember fromInstaMember = actor.getInstaMember();
+
+        if (fromInstaMember.getUsername().equals(username.trim())) {
             return RsData.of("F-1", "본인을 호감상대로 등록할 수 없습니다.");
         }
+        // 액터가 생성한 `좋아요` 들 가져오기
+        List<LikeablePerson> fromLikeablePeople = fromInstaMember.getFromLikeablePeople();
+
+        LikeablePerson fromLikeablePerson = fromLikeablePeople
+                .stream()
+                .filter(e -> e.getToInstaMember().getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
+
 
         //로그인한 유저가 좋아하는 LikeablePerson ListArray 불러오기
         List<LikeablePerson> memberbyFromInstaMemberId = likeablePersonRepository.findByFromInstaMemberId(
-                member.getInstaMember().getId());
+                actor.getInstaMember().getId());
         // 호감상대 10명으로 제한
         if (memberbyFromInstaMemberId.size()>=registrationLimit) {
             return RsData.of("F-4","이미 호감상대가 10명입니다;(");
@@ -47,29 +58,31 @@ public class LikeablePersonService {
     }
 
     public RsData isAlreadyLiked(Member member, String username, int attractiveTypeCode) {
-        //호감 추가 하려는 유저에 대한 InstaMember 를 가져온다
-        Optional<InstaMember> toInstabyUsername = instaMemberService.findByUsername(username.trim());
 
-        if (toInstabyUsername.isPresent()) {
-            // 해당하는 LikeablePerson 있는지 확인해보기
-            Optional<LikeablePerson> targetLikeablePerson =
-                    likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(
-                            member.getInstaMember().getId(), toInstabyUsername.get().getId());
-            //동일한 유저 인지 확인하는 메서드
-            if ( targetLikeablePerson.isPresent() ) {
+        List<LikeablePerson> fromLikeablePeople = member.getInstaMember().getFromLikeablePeople();
 
-                if (Objects.equals(targetLikeablePerson
-                        .get().getAttractiveTypeCode(), attractiveTypeCode)) {
-                    return RsData.of("F-3","이미 동일한 유형으로 등록한 호감상대 입니다.");
-                }
+        LikeablePerson fromLikeablePerson = fromLikeablePeople
+                .stream()
+                .filter(e -> e.getToInstaMember().getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
 
-                // 이미 있는 LikeablePerson 이지만 호감 유형이 다를때 수정을 위해 실행
-                isAlreadyLikedModify(targetLikeablePerson.get(),attractiveTypeCode);
 
-                return RsData.of("S-2","호감 상대 %s 유형이 변경 되었습니다.".formatted(username));
-            }
+        if (fromLikeablePerson == null) {
+            return RsData.of("F-7", "호감표시를 하지 않았습니다.");
         }
-        return RsData.of("S-1", "입력하신 인스타유저(%s)를 호감상대로 등록가능합니다.".formatted(username));
+
+        String oldAttractiveTypeDisplayName = fromLikeablePerson.getAttractiveTypeDisplayName();
+
+        fromLikeablePerson.setAttractiveTypeCode(attractiveTypeCode);
+        likeablePersonRepository.save(fromLikeablePerson);
+
+        String newAttractiveTypeDisplayName = fromLikeablePerson.getAttractiveTypeDisplayName();
+
+        return RsData.of("S-3",
+                "%s님에 대한 호감사유를 %s에서 %s(으)로 변경합니다.".formatted(username,
+                        oldAttractiveTypeDisplayName, newAttractiveTypeDisplayName));
+
     }
 
     @Transactional

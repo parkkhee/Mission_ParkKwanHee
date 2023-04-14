@@ -239,6 +239,27 @@ public class LikeablePersonControllerTests {
 
     }
 
+    @Test
+    @DisplayName("인스타아이디가 없는 회원은 대해서 호감표시를 할 수 없다.")
+    @WithUserDetails("user1")
+    void t012() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user4")
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is4xxClientError());
+        ;
+    }
+
     @Autowired
     MemberService memberService;
     @Autowired
@@ -296,8 +317,16 @@ public class LikeablePersonControllerTests {
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("add"))
-                .andExpect(MockMvcResultMatchers.content().string(org.hamcrest.Matchers.containsString("/likeablePerson/list")))
+                .andExpect(status().is3xxRedirection())
         ;
+//강사님 코드
+//        Optional<LikeablePerson> opLikeablePerson = likeablePersonService.findByFromInstaMember_usernameAndToInstaMember_username("insta_user3", "insta_user4");
+//
+//        int newAttractiveTypeCode = opLikeablePerson
+//                .map(LikeablePerson::getAttractiveTypeCode)
+//                .orElse(-1);
+//
+//        assertThat(newAttractiveTypeCode).isEqualTo(2);
 
     }
 
