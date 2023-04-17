@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
+import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
@@ -23,8 +24,6 @@ public class LikeablePersonService {
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
 
-    @Value("${custom.registration.limit}")
-    private int registrationLimit;
 
     // 호감표시가 가능한지 체크하는 메서드
     public RsData canLike(Member actor, String username) {
@@ -46,13 +45,14 @@ public class LikeablePersonService {
                 .findFirst()
                 .orElse(null);
 
+        long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
 
         //로그인한 유저가 좋아하는 LikeablePerson ListArray 불러오기
         List<LikeablePerson> memberbyFromInstaMemberId = likeablePersonRepository.findByFromInstaMemberId(
                 actor.getInstaMember().getId());
         // 호감상대 10명으로 제한
-        if (memberbyFromInstaMemberId.size()>=registrationLimit) {
-            return RsData.of("F-4","이미 호감상대가 10명입니다;(");
+        if (memberbyFromInstaMemberId.size()>=likeablePersonFromMax) {
+            return RsData.of("F-4","이미 호감상대가 %s명입니다;(".formatted(likeablePersonFromMax));
         }
         return RsData.of("S-1", "이미 있는 유저 입니다. 다른 매력 포인트를 선택해 주세요.");
     }
@@ -82,19 +82,6 @@ public class LikeablePersonService {
         return RsData.of("S-3",
                 "%s님에 대한 호감사유를 %s에서 %s(으)로 변경합니다.".formatted(username,
                         oldAttractiveTypeDisplayName, newAttractiveTypeDisplayName));
-
-    }
-
-    @Transactional
-    public void isAlreadyLikedModify(LikeablePerson targetLikeablePerson, int attractiveTypeCode) {
-
-        // 수정할 LikeablePerson 찾기
-        LikeablePerson byFromInstaMemberIdAndToInstaMemberId =
-                targetLikeablePerson;
-
-        // 레포지토리에서 수정하기
-        likeablePersonRepository.updateByLikeablePersonId(
-                byFromInstaMemberIdAndToInstaMemberId.getId(), attractiveTypeCode);
 
     }
 
