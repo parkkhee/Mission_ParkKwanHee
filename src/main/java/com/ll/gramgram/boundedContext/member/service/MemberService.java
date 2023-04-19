@@ -4,7 +4,12 @@ import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.repository.MemberRepository;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +20,12 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true) // 아래 메서드들이 전부 readonly 라는 것을 명시, 나중을 위해
-public class MemberService {
+public class MemberService{
     private final PasswordEncoder passwordEncoder;
 
     private final MemberRepository memberRepository;
+
+    private final JavaMailSender javaMailSender;
 
     public Optional<Member> findByUsername(String username) {
         return memberRepository.findByUsername(username);
@@ -26,13 +33,14 @@ public class MemberService {
 
     @Transactional // SELECT 이외의 쿼리에 대한 가능성이 아주 조금이라도 있으면 붙인다.
     // 일반 회원가입(소셜 로그인을 통한 회원가입이 아님)
-    public RsData<Member> join(String username, String password) {
+    public RsData<Member> join(String username, String email, String password) {
         // "GRAMGRAM" 해당 회원이 일반회원가입으로 인해 생성되었다는걸 나타내기 위해서
-        return join("GRAMGRAM", username, password);
+        return join("GRAMGRAM", username, email, password);
     }
 
     // 내부 처리함수, 일반회원가입, 소셜로그인을 통한 회원가입(최초 로그인 시 한번만 발생)에서 이 함수를 사용함
-    private RsData<Member> join(String providerTypeCode, String username, String password) {
+    private RsData<Member> join(String providerTypeCode, String username, String email,
+                                String password) {
         if (findByUsername(username).isPresent()) {
             return RsData.of("F-1", "해당 아이디(%s)는 이미 사용중입니다.".formatted(username));
         }
@@ -44,10 +52,20 @@ public class MemberService {
                 .builder()
                 .providerTypeCode(providerTypeCode)
                 .username(username)
+                .email(email)
                 .password(password)
                 .build();
 
         memberRepository.save(member);
+
+        //회원가입 축하 이메일
+        try {
+            String subject = "회원가입 축하 메일";
+            String body = member.getUsername() + "님, 회원가입을 축하드립니다!";
+            sendMail("khpark963@gmail.com", member.getEmail(), subject, body);
+        } catch (MessagingException me) {
+            me.printStackTrace();
+        }
 
         return RsData.of("S-1", "회원가입이 완료되었습니다.", member);
     }
@@ -68,6 +86,17 @@ public class MemberService {
         if (opMember.isPresent()) return RsData.of("S-2", "로그인 되었습니다.", opMember.get());
 
         // 소셜 로그인를 통한 가입시 비번은 없다.
-        return join(providerTypeCode, username, ""); // 최초 로그인 시 딱 한번 실행
+        return join(providerTypeCode, username, "",""); // 최초 로그인 시 딱 한번 실행
+    }
+
+    // 메일 전송 메소드
+    public void sendMail(String from, String to, String title, String content) throws MessagingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(title);
+        helper.setText(content, true);
+        javaMailSender.send(message);
     }
 }

@@ -25,6 +25,22 @@
                 return;
             }
 
+            // email 이(가) 올바른지 체크
+            form.email.value = form.email.value.trim(); // 입력란의 입력값에 있을지 모르는 좌우공백제거
+
+            if (form.email.value.length == 0) {
+                toastWarning('이메일을 입력해주세요.');
+                form.email.focus();
+                return;
+            }
+
+            const emailReg = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailReg.test(form.email.value)) {
+                toastWarning('이메일 형식이 올바르지 않습니다.');
+                form.email.focus();
+                return;
+            }
+
             // password 이(가) 올바른지 체크
 
             form.password.value = form.password.value.trim(); // 입력란의 입력값에 있을지 모르는 좌우공백제거

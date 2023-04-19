@@ -3,6 +3,7 @@ package com.ll.gramgram.boundedContext.member.entity;
 import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,6 +27,9 @@ public class Member extends BaseEntity {
     private String providerTypeCode; // 일반회원인지, 카카오로 가입한 회원인지, 구글로 가입한 회원인지
     @Column(unique = true)
     private String username;
+
+    @Email(message = "잘못된 이메일 형식입니다.")
+    private String email;
     private String password;
     @OneToOne // 1:1
     @Setter // memberService::updateInstaMember 함수 때문에

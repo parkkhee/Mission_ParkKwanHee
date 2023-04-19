@@ -35,6 +35,11 @@ public class MemberController {
         @NotBlank // 비어있지 않아야 하고, 공백으로만 이루어 지지도 않아야 한다.
         @Size(min = 4, max = 30) // 4자 이상, 30자 이하
         private final String username;
+
+        @NotBlank // 비어있지 않아야 하고, 공백으로만 이루어 지지도 않아야 한다.
+        @Size(max = 30) // 4자 이상, 30자 이하
+        private final String email;
+
         @NotBlank
         @Size(min = 4, max = 30)
         private final String password;
@@ -43,7 +48,8 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @PostMapping("/join")
     public String join(@Valid JoinForm joinForm) { // @Valid 가 없으면 @NotBlank 등이 작동하지 않음, 만약에 유효성 문제가 있다면 즉시 정지
-        RsData<Member> joinRs = memberService.join(joinForm.getUsername(), joinForm.getPassword());
+        RsData<Member> joinRs = memberService.join(joinForm.getUsername(), joinForm.getEmail()
+                ,joinForm.getPassword());
 
         if (joinRs.isFail()) {
             // 뒤로가기 하고 거기서 메세지 보여줘

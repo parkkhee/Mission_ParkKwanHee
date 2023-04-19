@@ -20,6 +20,15 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
+  mail:
+    host: smtp.gmail.com # 사용하는 SMTP 서버 호스트
+    port: 587 # SMTP 서버 포트
+    username: # 발신자 계정 이메일
+    password: # 발신자 계정 비밀번호
+    properties:
+      mail.smtp.auth: true # 인증 사용 여부
+      mail.smtp.starttls.enable: true # TLS 사용 여부
+      mail.smtp.starttls.required: true # TLS 필수 여부
 logging:
   level:
     root: INFO
