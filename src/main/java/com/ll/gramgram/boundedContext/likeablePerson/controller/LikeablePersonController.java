@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/likeablePerson")
+@RequestMapping("/usr/likeablePerson")
 @RequiredArgsConstructor
 public class LikeablePersonController {
     private final Rq rq;
@@ -64,14 +64,14 @@ public class LikeablePersonController {
         }
         // 단순 매력포인트 변경이라면 업데이트 후 통과
         if (isAlreadyLiked.getResultCode().equals("S-2")) {
-            return rq.redirectWithMsg("/likeablePerson/list", isAlreadyLiked);
+            return rq.redirectWithMsg("/usr/likeablePerson/list", isAlreadyLiked);
         }
 
 
         RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(),
                 likeForm.getUsername(), likeForm.getAttractiveTypeCode());
 
-        return rq.redirectWithMsg("/likeablePerson/list", createRsData);
+        return rq.redirectWithMsg("/usr/likeablePerson/list", createRsData);
 //        return "usr/home/test";
     }
 
@@ -104,7 +104,7 @@ public class LikeablePersonController {
             return rq.historyBack(deleteRsdata);
         }
 
-        return rq.redirectWithMsg("/likeablePerson/list", deleteRsdata);
+        return rq.redirectWithMsg("/usr/likeablePerson/list", deleteRsdata);
 
 
     }
@@ -139,6 +139,6 @@ public class LikeablePersonController {
             return rq.historyBack(rsData);
         }
 
-        return rq.redirectWithMsg("/likeablePerson/list", rsData);
+        return rq.redirectWithMsg("/usr/likeablePerson/list", rsData);
     }
 }
