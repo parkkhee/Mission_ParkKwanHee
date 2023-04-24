@@ -91,14 +91,14 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()") //먼저 웹 사이트에 로그인이 되어 있는지 확인.
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") Long id) {
+    public String cancel(@PathVariable("id") Long id) {
         LikeablePerson likeablePerson = likeablePersonService.likeablepersonbyId(id).orElse(null);
 
-        RsData canActorDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
+        RsData canActorCancelRsData = likeablePersonService.canActorCancel(rq.getMember(), likeablePerson);
 
-        if (canActorDeleteRsData.isFail()) return rq.historyBack(canActorDeleteRsData);
+        if (canActorCancelRsData.isFail()) return rq.historyBack(canActorCancelRsData);
 
-        RsData<LikeablePerson> deleteRsdata = likeablePersonService.delete(likeablePerson);
+        RsData<LikeablePerson> deleteRsdata = likeablePersonService.cancel(likeablePerson);
 
         if (deleteRsdata.isFail()) {
             return rq.historyBack(deleteRsdata);

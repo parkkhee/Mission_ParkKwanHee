@@ -120,7 +120,7 @@ public class LikeablePersonService {
         return likeablePersonRepository.findById(id);
     }
 
-    public RsData<LikeablePerson> canActorDelete(Member member, LikeablePerson likeablePerson) {
+    public RsData<LikeablePerson> canActorCancel(Member member, LikeablePerson likeablePerson) {
 
         if (likeablePerson == null) {
             return RsData.of("F-1", "존재하지 않는 회원입니다.");
@@ -135,7 +135,7 @@ public class LikeablePersonService {
     }
 
     @Transactional
-    public RsData<LikeablePerson> delete(LikeablePerson likeablePerson) {
+    public RsData<LikeablePerson> cancel(LikeablePerson likeablePerson) {
 
         // 너가 생성한 좋아요가 사라졌어.
         likeablePerson.getFromInstaMember().removeFromLikeablePerson(likeablePerson);
