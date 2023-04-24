@@ -59,13 +59,13 @@ public class MemberService{
         memberRepository.save(member);
 
         //회원가입 축하 이메일
-        try {
-            String subject = "회원가입 축하 메일";
-            String body = member.getUsername() + "님, 회원가입을 축하드립니다!";
-            sendMail("khpark963@gmail.com", member.getEmail(), subject, body);
-        } catch (MessagingException me) {
-            me.printStackTrace();
-        }
+//        try {
+//            String subject = "회원가입 축하 메일";
+//            String body = member.getUsername() + "님, 회원가입을 축하드립니다!";
+//            sendMail("khpark963@gmail.com", member.getEmail(), subject, body);
+//        } catch (MessagingException me) {
+//            me.printStackTrace();
+//        }
 
         return RsData.of("S-1", "회원가입이 완료되었습니다.", member);
     }

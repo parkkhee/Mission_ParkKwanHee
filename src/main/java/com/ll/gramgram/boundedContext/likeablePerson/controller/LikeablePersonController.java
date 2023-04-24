@@ -30,25 +30,25 @@ public class LikeablePersonController {
 
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/add")
-    public String showAdd() {
-        return "usr/likeablePerson/add";
+    @GetMapping("/like")
+    public String showLike() {
+        return "usr/likeablePerson/like";
     }
 
     @AllArgsConstructor
     @Getter
-    public static class AddForm {
+    public static class LikeForm {
         private final String username;
         private final int attractiveTypeCode;
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/add")
-    public String add(@Valid AddForm addForm) {
+    @PostMapping("/like")
+    public String like(@Valid LikeForm likeForm) {
 
         // LikeablePerson에 추가 할 수 있는지 확인
         RsData canLikeRsData = likeablePersonService.canLike(rq.getMember(),
-                addForm.getUsername());
+                likeForm.getUsername());
 
         if (canLikeRsData.isFail()) {
             return rq.historyBack(canLikeRsData);
@@ -58,7 +58,7 @@ public class LikeablePersonController {
 
         // 중복 되는 LikeablePerson 이 있는지 확인
         RsData isAlreadyLiked = likeablePersonService.isAlreadyLiked(rq.getMember(),
-                addForm.getUsername(), addForm.getAttractiveTypeCode());
+                likeForm.getUsername(), likeForm.getAttractiveTypeCode());
         if (isAlreadyLiked.isFail()) {
             return rq.historyBack(canLikeRsData);
         }
@@ -69,7 +69,7 @@ public class LikeablePersonController {
 
 
         RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(),
-                addForm.getUsername(), addForm.getAttractiveTypeCode());
+                likeForm.getUsername(), likeForm.getAttractiveTypeCode());
 
         return rq.redirectWithMsg("/likeablePerson/list", createRsData);
 //        return "usr/home/test";
