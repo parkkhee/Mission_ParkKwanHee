@@ -1,13 +1,62 @@
 spring:
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
   profiles:
     active: dev
+    include: secret
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://127.0.0.1:3306/gram__dev?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
     username: root
     password: qkr96#
-  config:
-    import: "classpath:base.yml"
+  security:
+    oauth2:
+      client:
+        registration:
+          naver:
+            scope:
+            client-name: Naver
+            authorization-grant-type: authorization_code
+            redirect-uri: 'https://localhost/login/oauth2/code/naver'
+          kakao:
+            scope:
+            client-name: Kakao
+            authorization-grant-type: authorization_code
+            redirect-uri: 'https://localhost/login/oauth2/code/kakao'
+            client-authentication-method: POST
+          google:
+            redirect-uri: 'https://localhost/login/oauth2/code/google'
+            client-name: Google
+            scope: profile
+          facebook:
+            redirect-uri: 'https://localhost/login/oauth2/code/facebook'
+            client-name: Facebook
+            scope:
+          instagram:
+            provider: instagram
+            scope: user_profile,user_media
+            client-name: Instagram
+            authorization-grant-type: authorization_code
+            redirect-uri: "https://localhost/login/oauth2/code/instagram"
+            client-authentication-method: client_secret_post
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+          naver:
+            authorization-uri: https://nid.naver.com/oauth2.0/authorize
+            token-uri: https://nid.naver.com/oauth2.0/token
+            user-info-uri: https://openapi.naver.com/v1/nid/me
+            user-name-attribute: response
+          instagram:
+            authorization-uri: https://api.instagram.com/oauth/authorize
+            token-uri: https://api.instagram.com/oauth/access_token
+            user-info-uri: https://graph.instagram.com/me?fields=id,username&access_token={access-token}
+            user-name-attribute: username
   jpa:
     hibernate:
       ddl-auto: create
@@ -19,6 +68,11 @@ spring:
 logging:
   level:
     root: INFO
-    com.ll.gramgram_ai: DEBUG
+    com.ll.gramgram: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
+custom:
+  likeablePerson:
+    modifyCoolTime: '#{60 * 60 * 3}'
+    from:
+      max: 10

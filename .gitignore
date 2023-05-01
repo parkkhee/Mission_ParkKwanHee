@@ -38,3 +38,8 @@ out/
 
 ### API 클라이언트 정보 ###
 base.yml
+
+### Custom ###
+application-secret.yml
+
+src/main/generated
