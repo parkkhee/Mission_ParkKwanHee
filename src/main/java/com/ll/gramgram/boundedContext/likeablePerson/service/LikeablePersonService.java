@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -56,6 +57,7 @@ public class LikeablePersonService {
         // 너를 좋아하는 호감표시 생겼어.
         toInstaMember.addToLikeablePerson(likeablePerson);
 
+
         publisher.publishEvent(new EventAfterLike(this, likeablePerson));
 
         return RsData.of("S-1", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
@@ -95,6 +97,10 @@ public class LikeablePersonService {
 
         if (actorInstaMemberId != fromInstaMemberId)
             return RsData.of("F-2", "권한이 없습니다.");
+
+        if (!likeablePerson.isModifyUnlocked()) {
+            return RsData.of("F-3", "아직 삭제 가능한 시간이 아닙니다.");
+        }
 
         return RsData.of("S-1", "삭제가능합니다.");
     }
@@ -207,6 +213,10 @@ public class LikeablePersonService {
 
         if (!Objects.equals(likeablePerson.getFromInstaMember().getId(), fromInstaMember.getId())) {
             return RsData.of("F-2", "해당 호감표시를 취소할 권한이 없습니다.");
+        }
+
+        if (!likeablePerson.isModifyUnlocked()) {
+            return RsData.of("F-3", "아직 호감표시를 수정할 수 있는 시간이 아닙니다.");
         }
 
 

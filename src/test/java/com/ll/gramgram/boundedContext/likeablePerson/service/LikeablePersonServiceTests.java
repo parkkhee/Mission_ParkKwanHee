@@ -3,7 +3,9 @@ package com.ll.gramgram.boundedContext.likeablePerson.service;
 
 import com.ll.gramgram.TestUt;
 import com.ll.gramgram.base.appConfig.AppConfig;
+import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
+import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
@@ -33,6 +35,9 @@ public class LikeablePersonServiceTests {
     private LikeablePersonService likeablePersonService;
     @Autowired
     private LikeablePersonRepository likeablePersonRepository;
+
+    @Autowired
+    private InstaMemberService instaMemberService;
 
     @Test
     @DisplayName("테스트 1")
@@ -253,7 +258,7 @@ public class LikeablePersonServiceTests {
         // 호감표시를 생성하면 쿨타임이 지정되기 때문에, 그래서 바로 수정이 안된다.
         // 그래서 강제로 쿨타임이 지난것으로 만든다.
         // 테스트를 위해서 억지로 값을 넣는다.
-        TestUt.setFieldValue(likeablePersonToBts, "modifyUnlockDate", LocalDateTime.now().minusSeconds(-1));
+        TestUt.setFieldValue(likeablePersonToBts, "modifyUnlockDate", LocalDateTime.now().minusSeconds(-6));
 
         // 수정을 하면 쿨타임이 갱신된다.
         likeablePersonService.modifyAttractive(memberUser3, likeablePersonToBts, 1);
@@ -262,5 +267,33 @@ public class LikeablePersonServiceTests {
         assertThat(
                 likeablePersonToBts.getModifyUnlockDate().isAfter(coolTime)
         ).isTrue();
+    }
+
+    @Test
+    @DisplayName("삭제 시간 체크")
+    void t009() throws Exception {
+
+        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
+        // 호감표시를 생성한다.
+        LikeablePerson likeablePersonToBts = likeablePersonService.like(memberUser3, "bts", 3).getData();
+
+        RsData rsData = likeablePersonService.canCancel(memberUser3, likeablePersonToBts);
+
+        assertThat("F-3").isEqualTo(rsData.getResultCode());
+
+    }
+
+    @Test
+    @DisplayName("삭제 시간 체크")
+    void t010() throws Exception {
+
+        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
+        // 호감표시를 생성한다.
+        LikeablePerson likeablePersonToBts = likeablePersonService.like(memberUser3, "bts", 3).getData();
+
+        RsData rsData = likeablePersonService.canModifyLike(memberUser3, likeablePersonToBts);
+
+        assertThat("F-3").isEqualTo(rsData.getResultCode());
+
     }
 }

@@ -27,4 +27,8 @@ public class AppConfig {
     public static LocalDateTime genLikeablePersonModifyUnlockDate() {
         return LocalDateTime.now().plusSeconds(likeablePersonModifyCoolTime);
     }
+
+    public static LocalDateTime genLikeablePersonActorUnlockDate(LocalDateTime actorModifyDate){
+        return actorModifyDate.plusSeconds(likeablePersonModifyCoolTime);
+    }
 }
