@@ -4,12 +4,16 @@ import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.event.EventAfterLike;
 import com.ll.gramgram.base.event.EventAfterModifyAttractiveType;
 import com.ll.gramgram.base.event.EventBeforeCancelLike;
+import com.ll.gramgram.base.event.EventNotification;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
+import com.ll.gramgram.boundedContext.notification.entity.Notification;
+import com.ll.gramgram.boundedContext.notification.repository.NotificationRepository;
+import com.ll.gramgram.boundedContext.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,10 @@ public class LikeablePersonService {
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
     private final ApplicationEventPublisher publisher;
+
+    private final NotificationRepository notificationRepository;
+
+    private final NotificationService notificationService;
 
     @Transactional
     public RsData<LikeablePerson> like(Member actor, String username, int attractiveTypeCode) {
@@ -56,7 +64,6 @@ public class LikeablePersonService {
 
         // 너를 좋아하는 호감표시 생겼어.
         toInstaMember.addToLikeablePerson(likeablePerson);
-
 
         publisher.publishEvent(new EventAfterLike(this, likeablePerson));
 

@@ -10,6 +10,8 @@ import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
+import com.ll.gramgram.boundedContext.notification.entity.Notification;
+import com.ll.gramgram.boundedContext.notification.repository.NotificationRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -294,6 +296,21 @@ public class LikeablePersonServiceTests {
         RsData rsData = likeablePersonService.canModifyLike(memberUser3, likeablePersonToBts);
 
         assertThat("F-3").isEqualTo(rsData.getResultCode());
+
+    }
+
+    @Autowired
+    NotificationRepository notificationRepository;
+
+    @Test
+    @DisplayName("like() 후 notification 엔티티에 추가가 되었는지 확인")
+    void t011() throws Exception {
+
+        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
+        // 호감표시를 생성한다.
+        likeablePersonService.like(memberUser3, "bts", 3).getData();
+
+        assertThat(notificationRepository.count()).isEqualTo(3L);
 
     }
 }

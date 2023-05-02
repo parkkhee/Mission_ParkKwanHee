@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.instaMember.service;
 
+import com.ll.gramgram.base.event.EventNotification;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMemberSnapshot;
@@ -9,6 +10,7 @@ import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,8 @@ public class InstaMemberService {
     private final InstaMemberRepository instaMemberRepository;
     private final MemberService memberService;
     private final InstaMemberSnapshotRepository instaMemberSnapshotRepository;
+
+    private final ApplicationEventPublisher publisher;
 
     public Optional<InstaMember> findByUsername(String username) {
         return instaMemberRepository.findByUsername(username);
@@ -113,7 +117,8 @@ public class InstaMemberService {
 
         saveSnapshot(snapshot);
 
-        // 알림
+        // 알림  InstaMemberService에서 바로 타 Service를 호출하고 싶지 않았다. 그래서 이벤트 호출
+        publisher.publishEvent(new EventNotification(this, likeablePerson));
     }
 
     public void whenBeforeCancelLike(LikeablePerson likeablePerson) {
