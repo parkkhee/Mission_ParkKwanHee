@@ -19,7 +19,7 @@ public class NotificationListener {
     @Transactional
     public void listen(EventNotification event) {
         Notification likeNotification = notificationService.createLikeNotification(event.getLikeablePerson().getFromInstaMember(),
-                event.getLikeablePerson().getFromInstaMember());
+                event.getLikeablePerson().getToInstaMember());
 
 //        notificationService.sendNotification(likeNotification);
     }
