@@ -42,7 +42,7 @@ public class NotificationService {
     @Transactional
     public void updateReadDate(List<Notification> notifications) {
 
-        notifications.stream().forEach(e -> e.updateReadDate(LocalDateTime.now()));
+        notifications.stream().filter(e->e.getReadDate() == null).forEach(e -> e.updateReadDate(LocalDateTime.now()));
 
     }
 
