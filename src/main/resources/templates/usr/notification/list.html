@@ -34,8 +34,8 @@
                                     <span class="badge badge-primary"
                                           th:text=
                                                   "|${#temporals.format(notification.getReadDate(), 'yy.MM.dd HH:mm ')},
-                                                   ${T(java.time.Duration).between(notification.getReadDate(), T(java.time.LocalDateTime).now()).toMinutes()}'분 전'|"></span>
-                                    <i class="fa-solid fa-fire text-red-500"></i>
+                                                   ${T(java.time.Duration).between(notification.getReadDate(), T(java.time.LocalDateTime).now()).toMinutes()}분 전|"></span>
+                                    <i class="fa-solid fa-fire text-red-500" th:if="${T(java.time.Duration).between(notification.getReadDate(), T(java.time.LocalDateTime).now()).toMinutes()}==0"></i>
                                 </div>
                             </div>
                             <div class="mt-4 flex flex-col gap-2">
