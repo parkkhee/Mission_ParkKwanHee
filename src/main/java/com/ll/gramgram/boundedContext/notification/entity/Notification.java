@@ -1,8 +1,6 @@
 package com.ll.gramgram.boundedContext.notification.entity;
 
-import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.baseEntity.BaseEntity;
-import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;

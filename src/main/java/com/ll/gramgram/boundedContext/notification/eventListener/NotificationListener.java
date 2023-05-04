@@ -1,6 +1,5 @@
 package com.ll.gramgram.boundedContext.notification.eventListener;
 
-import com.ll.gramgram.base.event.EventAfterModifyAttractiveType;
 import com.ll.gramgram.base.event.EventNotification;
 import com.ll.gramgram.boundedContext.notification.entity.Notification;
 import com.ll.gramgram.boundedContext.notification.service.NotificationService;
