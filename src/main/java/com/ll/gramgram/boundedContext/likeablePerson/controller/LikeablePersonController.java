@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/usr/likeablePerson")
@@ -120,23 +121,52 @@ public class LikeablePersonController {
         return rq.redirectWithMsg("/usr/likeablePerson/list", rsData);
     }
 
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
+//    @GetMapping("/toList")
+//    public String showToList(Model model) {
+//        InstaMember instaMember = rq.getMember().getInstaMember();
+//
+//        // 인스타인증을 했는지 체크
+////        if (instaMember != null) {
+////            // 해당 인스타회원이 좋아하는 사람들 목록
+////            List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
+////            model.addAttribute("likeablePeople", likeablePeople);
+////        }
+//        if (instaMember != null) {
+//            List<LikeablePerson> meToLikeablePeople = likeablePersonService.findByToInstaMemberId(instaMember.getId());
+//            model.addAttribute("likeablePeople", meToLikeablePeople);
+//        }
+//
+//
+//        return "usr/likeablePerson/toList";
+//    }
+
     @GetMapping("/toList")
-    public String showToList(Model model) {
+    public String toList(Model model, @RequestParam(name = "gender", required = false) String gender) {
+        // gender 값에 따라 필요한 작업을 수행하는 코드 작성
+
         InstaMember instaMember = rq.getMember().getInstaMember();
 
-        // 인스타인증을 했는지 체크
-//        if (instaMember != null) {
-//            // 해당 인스타회원이 좋아하는 사람들 목록
-//            List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
-//            model.addAttribute("likeablePeople", likeablePeople);
-//        }
+
+
         if (instaMember != null) {
-            List<LikeablePerson> meToLikeablePeople = likeablePersonService.findByToInstaMemberId(instaMember.getId());
+
+            if (gender == null) {
+                List<LikeablePerson> meToLikeablePeople = likeablePersonService.findByToInstaMemberId(instaMember.getId());
+                model.addAttribute("likeablePeople", meToLikeablePeople);
+                return "usr/likeablePerson/toList"; // 결과 페이지 리턴
+            }
+
+
+            Optional<LikeablePerson> meToLikeablePeople =
+                    likeablePersonService.findQslByToInstaMemberIdAndToInstaMember_gender(instaMember.getId(),gender);
+
             model.addAttribute("likeablePeople", meToLikeablePeople);
         }
 
 
-        return "usr/likeablePerson/toList";
+        return "usr/likeablePerson/toList"; // 결과 페이지 리턴
     }
+
+
 }

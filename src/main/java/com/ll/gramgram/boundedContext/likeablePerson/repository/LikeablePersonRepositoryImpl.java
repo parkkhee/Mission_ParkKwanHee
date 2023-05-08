@@ -26,4 +26,21 @@ public class LikeablePersonRepositoryImpl implements LikeablePersonRepositoryCus
                         .fetchOne()
         );
     }
+
+    @Override
+    public Optional<LikeablePerson> findQslByToInstaMemberIdAndToInstaMember_gender(long toInstaMemberId, String gender) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(likeablePerson)
+                        .where(
+                                likeablePerson.fromInstaMember.id.eq(toInstaMemberId)
+                                        .and(
+                                                likeablePerson.toInstaMember.gender.eq(gender)
+                                        )
+                        )
+                        .fetchOne()
+        );
+    }
+
+
 }

@@ -73,6 +73,10 @@ public class LikeablePersonService {
         return likeablePersonRepository.findByToInstaMemberId(toInstaMemberId);
     }
 
+    public Optional<LikeablePerson> findQslByToInstaMemberIdAndToInstaMember_gender(long instaMemberId, String gender) {
+        return likeablePersonRepository.findQslByToInstaMemberIdAndToInstaMember_gender(instaMemberId,gender);
+    }
+
     @Transactional
     public RsData cancel(LikeablePerson likeablePerson) {
         publisher.publishEvent(new EventBeforeCancelLike(this, likeablePerson));
