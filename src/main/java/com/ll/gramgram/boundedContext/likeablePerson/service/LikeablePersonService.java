@@ -227,4 +227,15 @@ public class LikeablePersonService {
 
         return RsData.of("S-1", "호감사유변경이 가능합니다.");
     }
+
+    public List<LikeablePerson> filterByAttractiveTypeCode(List<LikeablePerson> meToLikeablePeople,
+                                                           Integer attractiveTypeCode) {
+
+        List<LikeablePerson> likeablePeople = meToLikeablePeople
+                .stream()
+                .filter(e->e.getAttractiveTypeCode() == attractiveTypeCode)
+                .toList();
+
+        return likeablePeople;
+    }
 }

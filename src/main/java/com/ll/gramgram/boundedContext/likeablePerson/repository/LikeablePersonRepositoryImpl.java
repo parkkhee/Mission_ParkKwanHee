@@ -33,9 +33,9 @@ public class LikeablePersonRepositoryImpl implements LikeablePersonRepositoryCus
                 jpaQueryFactory
                         .selectFrom(likeablePerson)
                         .where(
-                                likeablePerson.fromInstaMember.id.eq(toInstaMemberId)
+                                likeablePerson.toInstaMember.id.eq(toInstaMemberId)
                                         .and(
-                                                likeablePerson.toInstaMember.gender.eq(gender)
+                                                likeablePerson.fromInstaMember.gender.eq(gender)
                                         )
                         )
                         .fetchOne()
