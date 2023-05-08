@@ -69,9 +69,9 @@ public class LikeablePersonService {
         return likeablePersonRepository.findById(id);
     }
 
-//    public List<LikeablePerson> findByToInstaMemberId(Long toInstaMemberId) {
-//        return likeablePersonRepository.findByToInstaMemberId(toInstaMemberId);
-//    }
+    public List<LikeablePerson> findByToInstaMemberId(Long toInstaMemberId) {
+        return likeablePersonRepository.findByToInstaMemberId(toInstaMemberId);
+    }
 
     @Transactional
     public RsData cancel(LikeablePerson likeablePerson) {

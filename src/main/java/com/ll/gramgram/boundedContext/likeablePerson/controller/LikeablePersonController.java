@@ -131,10 +131,10 @@ public class LikeablePersonController {
 //            List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
 //            model.addAttribute("likeablePeople", likeablePeople);
 //        }
-//        if (instaMember != null) {
-//            List<LikeablePerson> meToLikeablePeople = likeablePersonService.findByToInstaMemberId(instaMember.getId());
-//            model.addAttribute("likeablePeople", meToLikeablePeople);
-//        }
+        if (instaMember != null) {
+            List<LikeablePerson> meToLikeablePeople = likeablePersonService.findByToInstaMemberId(instaMember.getId());
+            model.addAttribute("likeablePeople", meToLikeablePeople);
+        }
 
 
         return "usr/likeablePerson/toList";
