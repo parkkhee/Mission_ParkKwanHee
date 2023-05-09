@@ -1,9 +1,12 @@
 package com.ll.gramgram.boundedContext.likeablePerson.repository;
 
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.ll.gramgram.boundedContext.likeablePerson.entity.QLikeablePerson.likeablePerson;
@@ -41,6 +44,18 @@ public class LikeablePersonRepositoryImpl implements LikeablePersonRepositoryCus
                         .fetchOne()
         );
     }
+
+    @Override
+    public List<LikeablePerson> findAll(BooleanBuilder builder, OrderSpecifier<?> orderSpecifier){
+
+        return jpaQueryFactory
+                .selectFrom(likeablePerson)
+                .where(builder)
+                .orderBy(orderSpecifier)
+                .fetch();
+
+    }
+
 
 
 }

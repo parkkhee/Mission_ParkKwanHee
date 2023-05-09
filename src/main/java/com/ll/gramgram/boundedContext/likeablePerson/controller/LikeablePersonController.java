@@ -4,7 +4,9 @@ import com.ll.gramgram.base.rq.Rq;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
+import com.ll.gramgram.boundedContext.likeablePerson.entity.QLikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
+import com.querydsl.core.BooleanBuilder;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -132,28 +134,12 @@ public class LikeablePersonController {
 
         if (instaMember != null) {
 
-            if (gender == null || gender.isBlank()) {
-                List<LikeablePerson> meToLikeablePeople = likeablePersonService.findByToInstaMemberId(instaMember.getId());
-                model.addAttribute("likeablePeople", meToLikeablePeople);
-                return "usr/likeablePerson/toList"; // 결과 페이지 리턴
-            }
+            List<LikeablePerson> likeablePeople = likeablePersonService
+                    .filterByGenderAndAttractiveTypeCode(instaMember, gender, attractiveTypeCode, sortCode);
 
-            Optional<LikeablePerson> meToLikeablePeople =
-                    likeablePersonService.findQslByToInstaMemberIdAndToInstaMember_gender(instaMember.getId(),gender);
-            if (!meToLikeablePeople.isPresent()) {
-                model.addAttribute("likeablePeople", Collections.emptyList());
-                return "usr/likeablePerson/toList"; // 결과 페이지 리턴
-            }
+            model.addAttribute("likeablePeople", likeablePeople);
 
-            if (attractiveTypeCode != null && !attractiveTypeCode.isBlank()) {
-                List<LikeablePerson> filterByAttractiveToLikeablePeople =
-                        likeablePersonService.filterByAttractiveTypeCode(meToLikeablePeople.stream().toList(), Integer.parseInt(attractiveTypeCode));
-                model.addAttribute("likeablePeople", filterByAttractiveToLikeablePeople);
-                return "usr/likeablePerson/toList"; // 결과 페이지 리턴
-            }
-
-
-            model.addAttribute("likeablePeople", meToLikeablePeople.get());
+            return "usr/likeablePerson/toList";
         }
 
 

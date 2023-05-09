@@ -8,13 +8,19 @@ import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
+import com.ll.gramgram.boundedContext.likeablePerson.entity.QLikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -228,14 +234,45 @@ public class LikeablePersonService {
         return RsData.of("S-1", "호감사유변경이 가능합니다.");
     }
 
-    public List<LikeablePerson> filterByAttractiveTypeCode(List<LikeablePerson> meToLikeablePeople,
-                                                           Integer attractiveTypeCode) {
+    public List<LikeablePerson> filterByGenderAndAttractiveTypeCode(InstaMember instaMember, String gender,
+                                                           String attractiveTypeCode, String sortCode) {
 
-        List<LikeablePerson> likeablePeople = meToLikeablePeople
-                .stream()
-                .filter(e->e.getAttractiveTypeCode() == attractiveTypeCode)
-                .toList();
+        QLikeablePerson qLikeablePerson = QLikeablePerson.likeablePerson;
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(qLikeablePerson.toInstaMember.username.eq(instaMember.getUsername()));
+        if (gender != null && !gender.isBlank()) {
+            builder.and(qLikeablePerson.fromInstaMember.gender.eq(gender));
+        }
+        if (attractiveTypeCode != null && !attractiveTypeCode.isBlank()) {
+            builder.and(qLikeablePerson.attractiveTypeCode.eq(Integer.parseInt(attractiveTypeCode)));
+        }
+
+        OrderSpecifier<?> getOrderSpecifier = getOrderSpecifier(sortCode, qLikeablePerson);
+
+        List<LikeablePerson> likeablePeople = likeablePersonRepository.findAll(builder,getOrderSpecifier);
 
         return likeablePeople;
     }
+
+    public OrderSpecifier<?> getOrderSpecifier(String sortCode, QLikeablePerson qLikeablePerson) {
+        if ("1".equals(sortCode)) {
+            return qLikeablePerson.id.desc();
+        } else if ("2".equals(sortCode)) {
+            return new OrderSpecifier<>(Order.ASC, qLikeablePerson.createDate);
+        } else if ("3".equals(sortCode)) {
+            return qLikeablePerson.fromInstaMember.toLikeablePeople.size().desc();
+        } else if ("4".equals(sortCode)) {
+            return qLikeablePerson.fromInstaMember.toLikeablePeople.size().asc();
+        } else if ("5".equals(sortCode)) {
+            return qLikeablePerson.toInstaMember.gender.desc();
+        } else if ("6".equals(sortCode)) {
+            return qLikeablePerson.attractiveTypeCode.asc();
+        } else {
+            return qLikeablePerson.id.desc(); // 기본 정렬 방식
+        }
+    }
+    public OrderSpecifier<LocalDateTime> test(String sortCode, QLikeablePerson qLikeablePerson) {
+        return qLikeablePerson.createDate.asc();
+    }
+
 }
