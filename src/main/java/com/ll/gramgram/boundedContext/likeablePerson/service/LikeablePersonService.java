@@ -255,20 +255,24 @@ public class LikeablePersonService {
     }
 
     public OrderSpecifier<?> getOrderSpecifier(String sortCode, QLikeablePerson qLikeablePerson) {
-        if ("1".equals(sortCode)) {
+
+        if (sortCode == null) {
             return qLikeablePerson.id.desc();
-        } else if ("2".equals(sortCode)) {
-            return new OrderSpecifier<>(Order.ASC, qLikeablePerson.createDate);
-        } else if ("3".equals(sortCode)) {
-            return qLikeablePerson.fromInstaMember.toLikeablePeople.size().desc();
-        } else if ("4".equals(sortCode)) {
-            return qLikeablePerson.fromInstaMember.toLikeablePeople.size().asc();
-        } else if ("5".equals(sortCode)) {
-            return qLikeablePerson.toInstaMember.gender.desc();
-        } else if ("6".equals(sortCode)) {
-            return qLikeablePerson.attractiveTypeCode.asc();
-        } else {
-            return qLikeablePerson.id.desc(); // 기본 정렬 방식
+        }else {
+            switch (sortCode) {
+                case "2":
+                    return new OrderSpecifier<>(Order.ASC, qLikeablePerson.createDate);
+                case "3":
+                    return qLikeablePerson.fromInstaMember.toLikeablePeople.size().desc();
+                case "4":
+                    return qLikeablePerson.fromInstaMember.toLikeablePeople.size().asc();
+                case "5":
+                    return qLikeablePerson.toInstaMember.gender.desc();
+                case "6":
+                    return qLikeablePerson.attractiveTypeCode.asc();
+                default:
+                    return qLikeablePerson.id.desc();
+            }
         }
     }
     public OrderSpecifier<LocalDateTime> test(String sortCode, QLikeablePerson qLikeablePerson) {
