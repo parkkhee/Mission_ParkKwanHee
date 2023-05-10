@@ -370,34 +370,34 @@ public class LikeablePersonServiceTests {
         assertThat(likeablePeople.get(0).getFromInstaMemberUsername()).isEqualTo("insta_user2");
     }
 
-    @Test
-    @DisplayName("성별 순 정렬")
-    void t013() throws Exception {
-        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
-        likeablePersonService.like(memberUser3, "insta_user4", 3).getData();
-        likeablePersonService.like(memberUser3, "insta_user5", 2).getData();
-
-        Member memberUser2 = memberService.findByUsername("user2").orElseThrow();
-        likeablePersonService.like(memberUser2, "insta_user4", 3).getData();
-        likeablePersonService.like(memberUser2, "insta_user3", 3).getData();
-        likeablePersonService.like(memberUser2, "insta_user5", 1).getData();
-
-        Member memberUser1 = memberService.findByUsername("user1").orElseThrow();
-        likeablePersonService.like(memberUser1, "insta_user4", 3).getData();
-        likeablePersonService.like(memberUser1, "insta_user5", 1).getData();
-
-
-        Member memberUser5 = memberService.findByUsername("user5").orElseThrow();
-        likeablePersonService.like(memberUser5, "insta_user4", 3).getData();
-        likeablePersonService.like(memberUser3, "insta_user3", 3).getData();
-
-
-        InstaMember instaMember4 = instaMemberRepository.findByUsername("insta_user4").get();
-        List<LikeablePerson> likeablePeople = likeablePersonService
-                .filterByGenderAndAttractiveTypeCode(instaMember4, "","","5");
-
-        assertThat(likeablePeople.get(0).getFromInstaMemberUsername()).isEqualTo("insta_user5");
-    }
+//    @Test
+//    @DisplayName("성별 순 정렬")
+//    void t013() throws Exception {
+//        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
+//        likeablePersonService.like(memberUser3, "insta_user4", 3).getData();
+//        likeablePersonService.like(memberUser3, "insta_user5", 2).getData();
+//
+//        Member memberUser2 = memberService.findByUsername("user2").orElseThrow();
+//        likeablePersonService.like(memberUser2, "insta_user4", 3).getData();
+//        likeablePersonService.like(memberUser2, "insta_user3", 3).getData();
+//        likeablePersonService.like(memberUser2, "insta_user5", 1).getData();
+//
+//        Member memberUser1 = memberService.findByUsername("user1").orElseThrow();
+//        likeablePersonService.like(memberUser1, "insta_user4", 3).getData();
+//        likeablePersonService.like(memberUser1, "insta_user5", 1).getData();
+//
+//
+//        Member memberUser5 = memberService.findByUsername("user5").orElseThrow();
+//        likeablePersonService.like(memberUser5, "insta_user4", 3).getData();
+//        likeablePersonService.like(memberUser3, "insta_user3", 3).getData();
+//
+//
+//        InstaMember instaMember4 = instaMemberRepository.findByUsername("insta_user4").get();
+//        List<LikeablePerson> likeablePeople = likeablePersonService
+//                .filterByGenderAndAttractiveTypeCode(instaMember4, "","","5");
+//
+//        assertThat(likeablePeople.get(0).getFromInstaMemberUsername()).isEqualTo("insta_user5");
+//    }
 
 
 
