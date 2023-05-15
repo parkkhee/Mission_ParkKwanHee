@@ -8,16 +8,29 @@ import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
+import com.ll.gramgram.boundedContext.likeablePerson.entity.QLikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.querydsl.core.types.dsl.Expressions;
 
+
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -69,9 +82,10 @@ public class LikeablePersonService {
         return likeablePersonRepository.findById(id);
     }
 
-//    public List<LikeablePerson> findByToInstaMemberId(Long toInstaMemberId) {
-//        return likeablePersonRepository.findByToInstaMemberId(toInstaMemberId);
-//    }
+    public List<LikeablePerson> findByToInstaMemberId(Long toInstaMemberId) {
+        return likeablePersonRepository.findByToInstaMemberId(toInstaMemberId);
+    }
+
 
     @Transactional
     public RsData cancel(LikeablePerson likeablePerson) {
@@ -223,4 +237,60 @@ public class LikeablePersonService {
 
         return RsData.of("S-1", "호감사유변경이 가능합니다.");
     }
+
+    public List<LikeablePerson> filterByGenderAndAttractiveTypeCode(InstaMember instaMember, String gender,
+                                                           String attractiveTypeCode, String sortCode) {
+
+        List<LikeablePerson> likeablePeople = likeablePersonRepository.findQslByToInstaMemberAndGenderAndAttractiveTypeCode
+                (instaMember, gender, Integer.parseInt(attractiveTypeCode), Integer.parseInt(sortCode));
+
+
+//        QLikeablePerson qLikeablePerson = QLikeablePerson.likeablePerson;
+//        BooleanBuilder builder = new BooleanBuilder();
+//        builder.and(qLikeablePerson.toInstaMember.username.eq(instaMember.getUsername()));
+//        if (gender != null && !gender.isBlank()) {
+//            builder.and(qLikeablePerson.fromInstaMember.gender.eq(gender));
+//        }
+//        if (attractiveTypeCode != null && !attractiveTypeCode.isBlank()) {
+//            builder.and(qLikeablePerson.attractiveTypeCode.eq(Integer.parseInt(attractiveTypeCode)));
+//        }
+//
+//        OrderSpecifier<?> getOrderSpecifier = getOrderSpecifier(sortCode, qLikeablePerson);
+//
+//        List<LikeablePerson> likeablePeople = likeablePersonRepository.findAll(builder,getOrderSpecifier);
+
+        return likeablePeople;
+    }
+
+    public OrderSpecifier<?> getOrderSpecifier(String sortCode, QLikeablePerson qLikeablePerson) {
+        CaseBuilder caseBuilder = new CaseBuilder();
+        if (sortCode == null) {
+            return qLikeablePerson.id.desc();
+        }else {
+            switch (sortCode) {
+                case "2":
+                    return new OrderSpecifier<>(Order.ASC, qLikeablePerson.createDate);
+                case "3":
+                    return qLikeablePerson.fromInstaMember.toLikeablePeople.size().desc();
+                case "4":
+                    return qLikeablePerson.fromInstaMember.toLikeablePeople.size().asc();
+                case "5":
+//                    return qLikeablePerson.toInstaMember.gender.desc();
+                    qLikeablePerson.id.desc();
+                    return new CaseBuilder()
+                            .when(qLikeablePerson.toInstaMember.gender.eq("W")).then(0)
+                            .otherwise(1)
+                            .asc();
+
+                case "6":
+                    return qLikeablePerson.attractiveTypeCode.asc();
+                default:
+                    return qLikeablePerson.id.desc();
+            }
+        }
+    }
+    public OrderSpecifier<LocalDateTime> test(String sortCode, QLikeablePerson qLikeablePerson) {
+        return qLikeablePerson.createDate.asc();
+    }
+
 }

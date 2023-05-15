@@ -4,7 +4,9 @@ import com.ll.gramgram.base.rq.Rq;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
+import com.ll.gramgram.boundedContext.likeablePerson.entity.QLikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
+import com.querydsl.core.BooleanBuilder;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/usr/likeablePerson")
@@ -120,23 +124,27 @@ public class LikeablePersonController {
         return rq.redirectWithMsg("/usr/likeablePerson/list", rsData);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
-    public String showToList(Model model) {
+    public String toList(Model model, @RequestParam(name = "gender", defaultValue = "") String gender,
+                         @RequestParam(name = "attractiveTypeCode", defaultValue = "0") String attractiveTypeCode,
+                         @RequestParam(name = "sortCode", defaultValue = "1") String sortCode) {
+        // gender 값에 따라 필요한 작업을 수행하는 코드 작성
+
         InstaMember instaMember = rq.getMember().getInstaMember();
 
-        // 인스타인증을 했는지 체크
-//        if (instaMember != null) {
-//            // 해당 인스타회원이 좋아하는 사람들 목록
-//            List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
-//            model.addAttribute("likeablePeople", likeablePeople);
-//        }
-//        if (instaMember != null) {
-//            List<LikeablePerson> meToLikeablePeople = likeablePersonService.findByToInstaMemberId(instaMember.getId());
-//            model.addAttribute("likeablePeople", meToLikeablePeople);
-//        }
+        if (instaMember != null) {
+
+            List<LikeablePerson> likeablePeople = likeablePersonService
+                    .filterByGenderAndAttractiveTypeCode(instaMember, gender, attractiveTypeCode, sortCode);
+
+            model.addAttribute("likeablePeople", likeablePeople);
+
+            return "usr/likeablePerson/toList";
+        }
 
 
-        return "usr/likeablePerson/toList";
+        return "usr/likeablePerson/toList"; // 결과 페이지 리턴
     }
+
+
 }
