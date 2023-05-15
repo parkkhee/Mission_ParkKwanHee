@@ -125,9 +125,9 @@ public class LikeablePersonController {
     }
 
     @GetMapping("/toList")
-    public String toList(Model model, @RequestParam(name = "gender", required = false) String gender,
-                         @RequestParam(name = "attractiveTypeCode", required = false) String attractiveTypeCode,
-                         @RequestParam(name = "sortCode", required = false) String sortCode) {
+    public String toList(Model model, @RequestParam(name = "gender", defaultValue = "") String gender,
+                         @RequestParam(name = "attractiveTypeCode", defaultValue = "0") String attractiveTypeCode,
+                         @RequestParam(name = "sortCode", defaultValue = "1") String sortCode) {
         // gender 값에 따라 필요한 작업을 수행하는 코드 작성
 
         InstaMember instaMember = rq.getMember().getInstaMember();

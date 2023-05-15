@@ -14,16 +14,23 @@ import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.querydsl.core.types.dsl.Expressions;
+
+
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -79,9 +86,6 @@ public class LikeablePersonService {
         return likeablePersonRepository.findByToInstaMemberId(toInstaMemberId);
     }
 
-    public Optional<LikeablePerson> findQslByToInstaMemberIdAndToInstaMember_gender(long instaMemberId, String gender) {
-        return likeablePersonRepository.findQslByToInstaMemberIdAndToInstaMember_gender(instaMemberId,gender);
-    }
 
     @Transactional
     public RsData cancel(LikeablePerson likeablePerson) {
@@ -237,25 +241,29 @@ public class LikeablePersonService {
     public List<LikeablePerson> filterByGenderAndAttractiveTypeCode(InstaMember instaMember, String gender,
                                                            String attractiveTypeCode, String sortCode) {
 
-        QLikeablePerson qLikeablePerson = QLikeablePerson.likeablePerson;
-        BooleanBuilder builder = new BooleanBuilder();
-        builder.and(qLikeablePerson.toInstaMember.username.eq(instaMember.getUsername()));
-        if (gender != null && !gender.isBlank()) {
-            builder.and(qLikeablePerson.fromInstaMember.gender.eq(gender));
-        }
-        if (attractiveTypeCode != null && !attractiveTypeCode.isBlank()) {
-            builder.and(qLikeablePerson.attractiveTypeCode.eq(Integer.parseInt(attractiveTypeCode)));
-        }
+        List<LikeablePerson> likeablePeople = likeablePersonRepository.findQslByToInstaMemberAndGenderAndAttractiveTypeCode
+                (instaMember, gender, Integer.parseInt(attractiveTypeCode), Integer.parseInt(sortCode));
 
-        OrderSpecifier<?> getOrderSpecifier = getOrderSpecifier(sortCode, qLikeablePerson);
 
-        List<LikeablePerson> likeablePeople = likeablePersonRepository.findAll(builder,getOrderSpecifier);
+//        QLikeablePerson qLikeablePerson = QLikeablePerson.likeablePerson;
+//        BooleanBuilder builder = new BooleanBuilder();
+//        builder.and(qLikeablePerson.toInstaMember.username.eq(instaMember.getUsername()));
+//        if (gender != null && !gender.isBlank()) {
+//            builder.and(qLikeablePerson.fromInstaMember.gender.eq(gender));
+//        }
+//        if (attractiveTypeCode != null && !attractiveTypeCode.isBlank()) {
+//            builder.and(qLikeablePerson.attractiveTypeCode.eq(Integer.parseInt(attractiveTypeCode)));
+//        }
+//
+//        OrderSpecifier<?> getOrderSpecifier = getOrderSpecifier(sortCode, qLikeablePerson);
+//
+//        List<LikeablePerson> likeablePeople = likeablePersonRepository.findAll(builder,getOrderSpecifier);
 
         return likeablePeople;
     }
 
     public OrderSpecifier<?> getOrderSpecifier(String sortCode, QLikeablePerson qLikeablePerson) {
-
+        CaseBuilder caseBuilder = new CaseBuilder();
         if (sortCode == null) {
             return qLikeablePerson.id.desc();
         }else {
@@ -267,7 +275,13 @@ public class LikeablePersonService {
                 case "4":
                     return qLikeablePerson.fromInstaMember.toLikeablePeople.size().asc();
                 case "5":
-                    return qLikeablePerson.toInstaMember.gender.desc();
+//                    return qLikeablePerson.toInstaMember.gender.desc();
+                    qLikeablePerson.id.desc();
+                    return new CaseBuilder()
+                            .when(qLikeablePerson.toInstaMember.gender.eq("W")).then(0)
+                            .otherwise(1)
+                            .asc();
+
                 case "6":
                     return qLikeablePerson.attractiveTypeCode.asc();
                 default:
